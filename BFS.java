@@ -8,16 +8,16 @@ import java.util.HashMap;
  */
 public class BFS {
   /**
-   * Finds the shortest path between two coordinates in a grid, avoiding blocked coordinates.
+   * Finds the shortest safe path between two coordinates in a grid, avoiding blocked coordinates.
    *
-   * @param from    the starting coordinate.
-   * @param to      the target coordinate.
-   * @param blocked a BitMap representing blocked coordinates.
+   * @param from the starting coordinate.
+   * @param to   the target coordinate.
+   * @param safe a BitMap representing safe coordinates.
    * @return an ArrayList of Directions representing the path from 'from' to 'to', or null if no path exists.
    */
-  public static ArrayList<Direction> directions(Coordinate from, Coordinate to, BitMap blocked) {
+  public static ArrayList<Direction> directions(Coordinate from, Coordinate to, BitMap safe) {
     if (from.equals(to)) return new ArrayList<>();
-    BitMap visited = blocked.or(from);
+    BitMap visited = safe.not().or(from);
     HashMap<Coordinate, Coordinate> fathers = new HashMap<>();
     HashMap<Coordinate, Direction> directions = new HashMap<>();
     ArrayList<Coordinate> queue = new ArrayList<>();
@@ -56,5 +56,11 @@ public class BFS {
       to = fathers.get(to);
     }
     return result;
+  }
+
+  public static int distance(Coordinate from, Coordinate to, BitMap safe) {
+    ArrayList<Direction> path = directions(from, to, safe);
+    if (path == null) return Integer.MAX_VALUE;
+    return path.size();
   }
 }

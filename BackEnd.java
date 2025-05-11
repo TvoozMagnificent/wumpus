@@ -83,6 +83,31 @@ public class BackEnd {
   }
 
   /**
+   * Returns a unique ID connected to the current observed level state.
+   * (The observed level state includes:
+   * 1. The BitMap loaded
+   * 2. The BitMap breeze
+   * 3. The BitMap stench
+   * 4. Arrow information, which includes
+   * 4a. Whether the arrow is shot,
+   * 4b. If so, whether it hit the Wumpus,
+   * and 4c. If so, the coordinate and direction of the shot.
+   * and finally,
+   * 5. Gold status (notice that where the gold is picked up is irrelevant)
+   * Notice how score is not included in this ID, since this ID
+   * is for Q-learning purposes, and the score is not relevant for Q-learning.
+   *
+   * @return A unique ID representing the current observed level state.
+   */
+  public ID getID() {
+    if (!level.hasArrow()) {
+      return new ID(loaded, breeze, stench, level.getShotCoordinate(), level.getShotDirection(), level.hasWumpus(), level.hasGold());
+    } else {
+      return new ID(loaded, breeze, stench, new Coordinate(0, 0), Direction.UP, false, level.hasGold());
+    }
+  }
+
+  /**
    * Returns the information about the cell at the specified coordinate in HTML.
    *
    * @param coordinate The coordinate to check.
@@ -108,21 +133,21 @@ public class BackEnd {
     if (level.hasEnded()) {
       switch (level.endType()) {
         case PIT:
-          return "<html>You fell into a pit. <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? </html>";
+          return "You fell into a pit. <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? ";
         case WUMPUS:
-          return "<html>You were eaten by the Wumpus. <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? </html>";
+          return "You were eaten by the Wumpus. <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? ";
         case WIN:
-          return "<html>You brought the gold back! <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? </html>";
+          return "You brought the gold back! <br/> Game over. <br/> Score: " + level.getScore() + "<br/> Play again? ";
       }
     }
-    StringBuilder info = new StringBuilder("<html>");
+    StringBuilder info = new StringBuilder();
     if (level.hasWumpus()) info.append("The Wumpus still dwells. <br/>");
     else info.append("The Wumpus is dead. <br/>");
     if (level.hasArrow()) info.append("You have an arrow. <br/>");
     else info.append("You used your arrow. <br/>");
     if (level.hasGold()) info.append("You have to retrieve the gold. <br/>");
     else info.append("You have to bring back the gold. <br/>");
-    info.append("Current score: ").append(level.getScore()).append("</html>");
+    info.append("Current score: ").append(level.getScore());
     return info.toString(); // replace trailing <br/>
   }
 }

@@ -3,10 +3,14 @@
  */
 class Level implements Interface {
   private final BitMap pitMap, breezeMap, stenchMap;
+  private Coordinate shotCoordinate = null;
+  private Direction shotDirection = null;
   private final Coordinate wumpusCoord, goldCoord, agentCoord;
   private boolean hasWumpus = true, hasArrow = true, hasGold = true, hasEnded = false;
   private int score = 0;
   private End endType = null;
+  private ActionType actionType;
+  private Direction actionDirection;
 
   /**
    * Constructs a Level with the specified parameters.
@@ -69,6 +73,8 @@ class Level implements Interface {
    * @return true if the move was successful, false otherwise.
    */
   public boolean move(Direction direction) {
+    this.actionType = ActionType.MOVE;
+    this.actionDirection = direction;
     if (!this.hasEnded && this.agentCoord.move(direction)) {
       this.score -= 1;
       if (this.pitMap.get(this.agentCoord)) {
@@ -119,7 +125,11 @@ class Level implements Interface {
   }
 
   public boolean shoot(Direction direction) {
+    this.actionType = ActionType.SHOOT;
+    this.actionDirection = direction;
     if (this.hasEnded || !hasArrow) return false;
+    this.shotCoordinate = this.agentCoord.copy();
+    this.shotDirection = direction;
     this.score -= 10;
     this.hasArrow = false;
     Coordinate arrow = agentCoord.copy();
@@ -160,5 +170,41 @@ class Level implements Interface {
     string += "Breeze: \n" + this.breezeMap.toString("B");
     string += "-------";
     return string;
+  }
+
+  /**
+   * Returns the coordinate of the shot.
+   *
+   * @return The coordinate of the shot.
+   */
+  public Coordinate getShotCoordinate() {
+    return this.shotCoordinate;
+  }
+
+  /**
+   * Returns the direction of the shot.
+   *
+   * @return The direction of the shot.
+   */
+  public Direction getShotDirection() {
+    return this.shotDirection;
+  }
+
+  /**
+   * Returns the type of the last action performed, regardless of whether it was successful or not.
+   *
+   * @return The type of the last action performed.
+   */
+  public ActionType getActionType() {
+    return this.actionType;
+  }
+  
+  /**
+   * Returns the direction of the last action performed, regardless of whether it was successful or not.
+   *
+   * @return The direction of the last action performed.
+   */
+  public Direction getActionDirection() {
+    return this.actionDirection;
   }
 }
